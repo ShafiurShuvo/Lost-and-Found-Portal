@@ -1,0 +1,424 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Lost & Found Portal{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f3e9f8 0%, #e6d9f0 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 20px 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .logo h1 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo .tagline {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .navbar {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-link {
+            padding: 10px 20px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-link:hover {
+            background: #f8f9fa;
+            color: #3498db;
+        }
+        
+        .nav-link.active {
+            background: #3498db;
+            color: white;
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .username {
+            padding: 8px 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .logout-link {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .logout-link:hover {
+            background: #c0392b;
+        }
+        
+        .admin-link {
+            background: #9b59b6;
+            color: white;
+        }
+        
+        .admin-link:hover {
+            background: #8e44ad;
+        }
+        
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+        
+        .flash-message {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .flash-success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #27ae60;
+        }
+        
+        .flash-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .flash-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #3498db;
+        }
+        
+        .main-content {
+            min-height: 500px;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 30px 0;
+            color: #000080;
+            margin-top: 50px;
+        }
+        
+        .footer-links {
+            margin-top: 15px;
+        }
+        
+        .footer-links a {
+            color: #000080;
+            text-decoration: none;
+            margin: 0 10px;
+            opacity: 0.8;
+        }
+        
+        .footer-links a:hover {
+            opacity: 1;
+        }
+        
+        /* Common components */
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn-primary {
+            background: #3498db;
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+        }
+        
+        .btn-success {
+            background: #27ae60;
+        }
+        
+        .btn-danger {
+            background: #e74c3c;
+        }
+        
+        .btn-large {
+            padding: 15px 30px;
+            font-size: 18px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        
+        .help-text {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .status-pending {
+            background: #ffeaa7;
+            color: #856404;
+        }
+        
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-verified {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .navbar {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .user-menu {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <h1><i class="fas fa-search"></i> Lost & Found Portal</h1>
+                <p class="tagline">🔒 Secure • Encrypted • Verified</p>
+            </div>
+            
+            <!-- Navigation -->
+            <nav class="navbar">
+                <a href="{{ url_for('home') }}" class="nav-link {% if request.endpoint == 'home' %}active{% endif %}">
+                    <i class="fas fa-home"></i> Home
+                </a>
+                
+                {% if session.get('user_id') %}
+                    <a href="{{ url_for('dashboard') }}" class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                    <a href="{{ url_for('post_item') }}" class="nav-link {% if request.endpoint == 'post_item' %}active{% endif %}">
+                        <i class="fas fa-plus-circle"></i> Post Item
+                    </a>
+                    <a href="{{ url_for('browse_items') }}" class="nav-link {% if request.endpoint == 'browse_items' %}active{% endif %}">
+                        <i class="fas fa-search"></i> Browse
+                    </a>
+                    <a href="{{ url_for('my_claims') }}" class="nav-link {% if request.endpoint == 'my_claims' %}active{% endif %}">
+                        <i class="fas fa-file-contract"></i> My Claims
+                    </a>
+                    
+                    {% if session.get('role') == 'admin' %}
+                        <a href="{{ url_for('admin_panel') }}" class="nav-link admin-link {% if request.endpoint == 'admin_panel' %}active{% endif %}">
+                            <i class="fas fa-shield-alt"></i> Admin
+                        </a>
+                    {% endif %}
+                    
+                    <div class="user-menu">
+                        <a href="{{ url_for('profile') }}" class="username" style="text-decoration: none; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.background='#e8f1f7'; this.style.color='#3498db';" onmouseout="this.style.background='#f8f9fa'; this.style.color='inherit';">
+                            <i class="fas fa-user"></i> {{ session.get('username') }}
+                        </a>
+                        <a href="{{ url_for('logout') }}" class="nav-link logout-link">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </div>
+                {% else %}
+                    <a href="{{ url_for('register') }}" class="nav-link {% if request.endpoint == 'register' %}active{% endif %}">
+                        <i class="fas fa-user-plus"></i> Register
+                    </a>
+                    <a href="{{ url_for('login') }}" class="nav-link {% if request.endpoint == 'login' %}active{% endif %}">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </a>
+                {% endif %}
+            </nav>
+        </header>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash-message flash-{{ category }}">
+                            <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Main Content -->
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2024 Lost & Found Portal. All rights reserved.</p>
+            <p class="footer-links">
+                <a href="#"><i class="fas fa-shield-alt"></i> Security: Custom RSA + ECC Encryption</a>
+                <a href="#"><i class="fas fa-key"></i> HMAC Data Integrity</a>
+                <a href="#"><i class="fas fa-mobile-alt"></i> Two-Factor Auth</a>
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Auto-hide flash messages
+        setTimeout(function() {
+            var flashMessages = document.querySelectorAll('.flash-message');
+            flashMessages.forEach(function(msg) {
+                msg.style.opacity = '0';
+                msg.style.transform = 'translateY(-10px)';
+                setTimeout(function() {
+                    msg.style.display = 'none';
+                }, 300);
+            });
+        }, 5000);
+    </script>
+</body>
+</html>

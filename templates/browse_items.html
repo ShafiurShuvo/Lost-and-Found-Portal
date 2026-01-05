@@ -1,0 +1,109 @@
+<!-- templates/browse_items.html - FIXED VERSION -->
+{% extends "base.html" %}
+
+{% block title %}Browse Items - Lost & Found{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 style="color: #2c3e50; margin-bottom: 20px; text-align: center;">
+        <i class="fas fa-search"></i> Browse Lost & Found Items
+    </h2>
+    <p style="text-align: center; color: #666; margin-bottom: 25px;">
+        Found something? Lost something? Browse items posted by our community.
+    </p>
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 30px;">
+        <a href="{{ url_for('post_item') }}" class="btn btn-primary">
+            <i class="fas fa-plus-circle"></i> Post New Item
+        </a>
+        
+        <div style="background: #f8f9fa; padding: 10px 15px; border-radius: 8px;">
+            Found <strong>{{ items|length }}</strong> item{{ 's' if items|length != 1 else '' }}
+        </div>
+    </div>
+</div>
+
+{% if items %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 30px;">
+        {% for item in items %}
+            <div class="card" style="padding: 0; overflow: hidden;">
+                <div style="padding: 25px;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+                        <h3 style="color: #2c3e50; margin: 0;">{{ item.title }}</h3>
+                        <span style="padding: 5px 15px; border-radius: 15px; font-size: 0.8rem; 
+                              {% if item.item_type == 'lost' %}background: #ffeaa7; color: #856404;{% else %}background: #d4edda; color: #155724;{% endif %}">
+                            <i class="fas fa-{% if item.item_type == 'lost' %}exclamation-triangle{% else %}search{% endif %}"></i>
+                            {{ item.item_type|title }}
+                        </span>
+                    </div>
+                    
+                    {% if item.photo_path %}
+                    <div style="margin: 20px 0; text-align: center;">
+                        <img src="{{ url_for('serve_upload', filename=item.photo_path) }}" 
+                             alt="{{ item.title }}"
+                             style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px;">
+                    </div>
+                    {% endif %}
+                    
+                    <p style="color: #666; line-height: 1.6; margin-bottom: 20px;">
+                        {{ item.description[:150] }}{% if item.description|length > 150 %}...{% endif %}
+                    </p>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; color: #666; font-size: 0.9rem;">
+                        <div>
+                            <i class="fas fa-map-marker-alt"></i> {{ item.location }}
+                        </div>
+                        <div>
+                            <i class="fas fa-folder"></i> {{ item.category|title }}
+                        </div>
+                        <div>
+                            <i class="fas fa-user"></i> {{ item.username }}
+                        </div>
+                        <div>
+                            <i class="fas fa-calendar"></i> {{ item.created_at.split()[0] if item.created_at else 'Recent' }}
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="background: #f8f9fa; padding: 20px; border-top: 1px solid #e0e0e0;">
+                    <a href="{{ url_for('claim_item', item_id=item.id) }}" class="btn btn-primary" style="width: 100%;">
+                        <i class="fas fa-file-contract"></i> File Claim
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="card" style="text-align: center; padding: 60px 20px;">
+        <i class="fas fa-search" style="font-size: 3rem; color: #ccc; margin-bottom: 20px;"></i>
+        <h3 style="color: #666; margin-bottom: 15px;">No Items Available</h3>
+        <p style="color: #666; margin-bottom: 30px;">Be the first to post an item in our community!</p>
+        <a href="{{ url_for('post_item') }}" class="btn btn-primary">
+            <i class="fas fa-plus-circle"></i> Post Your First Item
+        </a>
+    </div>
+{% endif %}
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; margin-top: 50px;">
+    <div class="card" style="border-left: 4px solid #3498db;">
+        <h4><i class="fas fa-shield-alt"></i> Secure Claim Process</h4>
+        <p style="margin-top: 15px; color: #666;">All claims go through a verification process:</p>
+        <ol style="margin-top: 10px; color: #666; padding-left: 20px;">
+            <li>Submit claim with proof of ownership</li>
+            <li>Item owner reviews the claim</li>
+            <li>Admin verifies legitimacy</li>
+            <li>Safe connection is established</li>
+        </ol>
+    </div>
+    
+    <div class="card" style="border-left: 4px solid #27ae60;">
+        <h4><i class="fas fa-question-circle"></i> How to Claim</h4>
+        <ul style="margin-top: 15px; color: #666; padding-left: 20px;">
+            <li>Click "File Claim" on the item you recognize</li>
+            <li>Provide detailed proof of ownership</li>
+            <li>Wait for owner review</li>
+            <li>Track your claim status in "My Claims"</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

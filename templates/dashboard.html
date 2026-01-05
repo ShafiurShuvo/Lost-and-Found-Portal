@@ -1,0 +1,164 @@
+<!-- templates/dashboard.html -->
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Lost & Found{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 style="color: #2c3e50; margin-bottom: 20px;">
+        <i class="fas fa-tachometer-alt"></i> Welcome back, {{ user.username }}!
+    </h2>
+    
+    <div style="display: flex; gap: 15px; margin-bottom: 30px; flex-wrap: wrap;">
+        <span style="padding: 8px 15px; background: #f8f9fa; border-radius: 8px;">
+            <i class="fas fa-user-tag"></i> {{ user.role|title }}
+        </span>
+        <span style="padding: 8px 15px; background: #f8f9fa; border-radius: 8px;">
+            <i class="fas fa-envelope"></i> {{ user.email }}
+        </span>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 30px 0;">
+        <div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+            <div style="font-size: 2rem; color: #3498db; margin-bottom: 10px;">
+                {{ items|length }}
+            </div>
+            <p>Your Items</p>
+        </div>
+        
+        <div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+            <div style="font-size: 2rem; color: #f39c12; margin-bottom: 10px;">
+                {{ pending_claims }}
+            </div>
+            <p>Pending Claims</p>
+        </div>
+        
+        <div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+            <div style="font-size: 2rem; color: #9b59b6; margin-bottom: 10px;">
+                {{ user.role|title }}
+            </div>
+            <p>Account Type</p>
+        </div>
+    </div>
+    
+    <div style="margin: 30px 0; text-align: center;">
+        <a href="{{ url_for('post_item') }}" class="btn btn-primary">
+            <i class="fas fa-plus-circle"></i> Post New Item
+        </a>
+        <a href="{{ url_for('browse_items') }}" class="btn btn-secondary">
+            <i class="fas fa-search"></i> Browse Items
+        </a>
+        <a href="{{ url_for('my_claims') }}" class="btn btn-success">
+            <i class="fas fa-file-contract"></i> My Claims
+            {% if pending_claims > 0 %}
+                <span style="background: #e74c3c; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; margin-left: 5px;">
+                    {{ pending_claims }}
+                </span>
+            {% endif %}
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <h3 style="color: #2c3e50; margin-bottom: 25px;">
+        <i class="fas fa-box-open"></i> Your Posted Items
+        <a href="{{ url_for('post_item') }}" class="btn btn-primary" style="float: right; font-size: 0.9rem;">
+            <i class="fas fa-plus"></i> Add More
+        </a>
+    </h3>
+    
+    {% if items %}
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px;">
+            {% for item in items %}
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; border: 1px solid #e0e0e0;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                        <h4>{{ item.title }}</h4>
+                        <span style="padding: 5px 10px; border-radius: 15px; font-size: 0.8rem; 
+                              {% if item.item_type == 'lost' %}background: #ffeaa7; color: #856404;{% else %}background: #d4edda; color: #155724;{% endif %}">
+                            <i class="fas fa-{% if item.item_type == 'lost' %}exclamation-triangle{% else %}search{% endif %}"></i>
+                            {{ item.item_type|title }}
+                        </span>
+                    </div>
+                    
+                    {% if item.photo_path %}
+                    <div style="margin: 15px 0; text-align: center;">
+                        <img src="{{ url_for('serve_upload', filename=item.photo_path) }}" 
+                             alt="{{ item.title }}"
+                             style="max-width: 100%; height: 150px; object-fit: cover; border-radius: 8px;">
+                    </div>
+                    {% endif %}
+                    
+                    <p style="color: #666; margin-bottom: 15px;">
+                        {{ item.description[:100] }}{% if item.description|length > 100 %}...{% endif %}
+                    </p>
+                    
+                    <div style="display: flex; justify-content: space-between; color: #666; font-size: 0.9rem; margin-bottom: 15px;">
+                        <span><i class="fas fa-map-marker-alt"></i> {{ item.location }}</span>
+                        <span><i class="fas fa-tag"></i> {{ item.category|title }}</span>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="padding: 5px 15px; border-radius: 15px; font-size: 0.8rem;
+                              {% if item.status == 'available' %}background: #d4edda; color: #155724;
+                              {% elif item.status == 'claimed' %}background: #fff3cd; color: #856404;
+                              {% else %}background: #d1ecf1; color: #0c5460;{% endif %}">
+                            {{ item.status|title }}
+                        </span>
+                        
+                        <a href="{{ url_for('manage_claims', item_id=item.id) }}" class="btn btn-warning" style="font-size: 0.9rem;">
+                            <i class="fas fa-tasks"></i> Manage Claims
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 40px 20px; color: #666;">
+            <i class="fas fa-box-open" style="font-size: 3rem; opacity: 0.5; margin-bottom: 20px;"></i>
+            <h4>No Items Yet</h4>
+            <p>You haven't posted any items yet. Start by posting your first lost or found item!</p>
+            <a href="{{ url_for('post_item') }}" class="btn btn-primary" style="margin-top: 20px;">
+                <i class="fas fa-plus-circle"></i> Post Your First Item
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h3 style="color: #2c3e50; margin-bottom: 25px;">
+        <i class="fas fa-bolt"></i> Quick Actions
+    </h3>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+        <a href="{{ url_for('post_item') }}" style="text-align: center; padding: 25px; background: #f8f9fa; border-radius: 10px; text-decoration: none; color: inherit;">
+            <div style="font-size: 2.5rem; color: #3498db; margin-bottom: 15px;">
+                <i class="fas fa-plus-circle"></i>
+            </div>
+            <h4>Post Item</h4>
+        </a>
+        
+        <a href="{{ url_for('browse_items') }}" style="text-align: center; padding: 25px; background: #f8f9fa; border-radius: 10px; text-decoration: none; color: inherit;">
+            <div style="font-size: 2.5rem; color: #3498db; margin-bottom: 15px;">
+                <i class="fas fa-search"></i>
+            </div>
+            <h4>Browse Items</h4>
+        </a>
+        
+        <a href="{{ url_for('my_claims') }}" style="text-align: center; padding: 25px; background: #f8f9fa; border-radius: 10px; text-decoration: none; color: inherit;">
+            <div style="font-size: 2.5rem; color: #3498db; margin-bottom: 15px;">
+                <i class="fas fa-file-contract"></i>
+            </div>
+            <h4>My Claims</h4>
+        </a>
+        
+        {% if user.role == 'admin' %}
+            <a href="{{ url_for('admin_panel') }}" style="text-align: center; padding: 25px; background: #9b59b6; border-radius: 10px; text-decoration: none; color: white;">
+                <div style="font-size: 2.5rem; margin-bottom: 15px;">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h4>Admin Panel</h4>
+            </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

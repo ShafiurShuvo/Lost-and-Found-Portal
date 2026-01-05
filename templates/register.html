@@ -1,0 +1,202 @@
+<!-- templates/register.html -->
+{% extends "base.html" %}
+
+{% block title %}Register - Lost & Found{% endblock %}
+
+{% block content %}
+<style>
+body {
+    background: linear-gradient(135deg, #f3e9f8 0%, #e6d9f0 100%);
+}
+
+.register-container {
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.register-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    padding: 50px 30px;
+}
+
+.register-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.register-header h1 {
+    font-size: 28px;
+    color: #333;
+    margin: 0;
+    font-weight: 700;
+}
+
+.register-header p {
+    color: #999;
+    margin: 10px 0 0 0;
+    font-size: 14px;
+}
+
+.register-form-group {
+    margin-bottom: 20px;
+}
+
+.register-label {
+    display: block;
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.register-input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.register-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.register-btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 25px;
+}
+
+.register-btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.register-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+}
+
+.register-info {
+    background: #f8f9ff;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 20px 0;
+    font-size: 13px;
+    color: #666;
+}
+
+.register-info h4 {
+    color: #333;
+    margin: 0 0 8px 0;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.register-info ul {
+    margin: 0;
+    padding-left: 18px;
+    line-height: 1.6;
+}
+
+.register-footer {
+    text-align: center;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.register-footer a {
+    color: #667eea;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.register-footer a:hover {
+    text-decoration: underline;
+}
+</style>
+
+<div class="register-container">
+    <div class="register-card">
+        <div class="register-header">
+            <h1>Create Account</h1>
+            <p>Secure registration with 2FA protection</p>
+        </div>
+        
+        {% with messages = get_flashed_messages(category_filter=['register_error']) %}
+            {% if messages %}
+                <div style="background: #f8d7da; color: #721c24; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 14px;">
+                    {{ messages[0] }}
+                </div>
+            {% endif %}
+        {% endwith %}
+        
+        <form method="POST" id="registerForm">
+            <div class="register-form-group">
+                <label for="username" class="register-label">Username *</label>
+                <input type="text" id="username" name="username" class="register-input"
+                       required placeholder="Min 3 characters" autocomplete="username">
+            </div>
+            
+            <div class="register-form-group">
+                <label for="email" class="register-label">Email *</label>
+                <input type="email" id="email" name="email" class="register-input"
+                       required placeholder="your.email@example.com" autocomplete="email">
+            </div>
+            
+            <div class="register-form-group">
+                <label for="full_name" class="register-label">Full Name (Optional)</label>
+                <input type="text" id="full_name" name="full_name" class="register-input"
+                       placeholder="Your full name">
+            </div>
+            
+            <div class="register-form-group">
+                <label for="password" class="register-label">Password *</label>
+                <input type="password" id="password" name="password" class="register-input"
+                       required placeholder="Min 6 characters" autocomplete="new-password">
+            </div>
+            
+            <div class="register-form-group">
+                <label for="confirm_password" class="register-label">Confirm Password *</label>
+                <input type="password" id="confirm_password" name="confirm_password" class="register-input"
+                       required placeholder="Re-enter password" autocomplete="new-password">
+            </div>
+            
+            <div class="register-info">
+                <h4>Security Features:</h4>
+                <ul>
+                    <li>Data encrypted before storage</li>
+                    <li>Two-factor authentication enabled</li>
+                    <li>RSA + ECC encryption</li>
+                    <li>HMAC integrity verification</li>
+                </ul>
+            </div>
+            
+            <button type="submit" class="register-btn register-btn-primary">
+                Create Account
+            </button>
+        </form>
+        
+        <div class="register-footer">
+            <p style="margin: 0 0 10px 0; color: #999; font-size: 14px;">Already have an account?</p>
+            <a href="{{ url_for('login') }}">Sign in here</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,569 @@
+<!-- templates/admin_verify_claim_crypto.html -->
+{% extends "base.html" %}
+
+{% block title %}Cryptographic Claim Verification{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 style="color: #2c3e50; margin-bottom: 20px;">
+        <i class="fas fa-user-shield"></i> Cryptographic Claim Verification
+    </h2>
+    <p style="color: #666; margin-bottom: 25px;">
+        Verify claim legitimacy using cryptographic verification methods and proof of ownership evidence.
+    </p>
+    
+    <div style="display: flex; gap: 15px; margin-bottom: 30px;">
+        <a href="{{ url_for('admin_claims_review') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Review
+        </a>
+        {% if claim.cryptographic_score %}
+        <span class="btn" style="background: {% if claim.cryptographic_score >= 80 %}#d4edda; color: #155724;
+                {% elif claim.cryptographic_score >= 60 %}#fff3cd; color: #856404;
+                {% elif claim.cryptographic_score >= 40 %}#ffeaa7; color: #856404;
+                {% else %}#f8d7da; color: #721c24;{% endif %}">
+            <i class="fas fa-chart-line"></i> Current Score: {{ claim.cryptographic_score }}%
+        </span>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Claim Information -->
+<div class="card">
+    <h3 style="color: #2c3e50; margin-bottom: 25px;">
+        <i class="fas fa-info-circle"></i> Claim Information
+    </h3>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 25px;">
+        <div>
+            <strong style="color: #666; font-size: 0.9rem;">Claim ID:</strong>
+            <p style="color: #2c3e50; margin-top: 5px;">#{{ claim.id }}</p>
+        </div>
+        
+        <div>
+            <strong style="color: #666; font-size: 0.9rem;">Claimant:</strong>
+            <p style="color: #2c3e50; margin-top: 5px;">{{ claim.claimant_username }}</p>
+        </div>
+        
+        <div>
+            <strong style="color: #666; font-size: 0.9rem;">Item Owner:</strong>
+            <p style="color: #2c3e50; margin-top: 5px;">{{ claim.owner_username }}</p>
+        </div>
+        
+        <div>
+            <strong style="color: #666; font-size: 0.9rem;">Status:</strong>
+            <p style="margin-top: 5px;">
+                <span style="padding: 5px 15px; border-radius: 15px; 
+                      {% if claim.status == 'pending' %}background: #fff3cd; color: #856404;
+                      {% elif claim.status == 'approved' %}background: #d4edda; color: #155724;
+                      {% else %}background: #f8d7da; color: #721c24;{% endif %}">
+                    {{ claim.status|title }}
+                </span>
+            </p>
+        </div>
+    </div>
+    
+    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+        <h4 style="color: #2c3e50; margin-bottom: 15px;">Claim Message:</h4>
+        <p style="color: #666; line-height: 1.6; white-space: pre-wrap;">{{ claim.claim_message }}</p>
+    </div>
+</div>
+
+<!-- Proof of Ownership Data -->
+{% if proof_data %}
+<div class="card">
+    <h3 style="color: #2c3e50; margin-bottom: 25px;">
+        <i class="fas fa-fingerprint"></i> Cryptographic Proof of Ownership
+    </h3>
+    
+    <div style="background: #f8f9fa; padding: 25px; border-radius: 8px;">
+        <h4 style="color: #2c3e50; margin-bottom: 20px;">
+            <i class="fas fa-key"></i> Proof Details
+        </h4>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 25px;">
+            {% if proof_data.proof_data and proof_data.proof_data.serial_number %}
+            <div>
+                <strong style="color: #666; font-size: 0.9rem;">Serial Number:</strong>
+                <p style="color: #2c3e50; margin-top: 5px; font-family: monospace;">{{ proof_data.proof_data.serial_number }}</p>
+            </div>
+            {% endif %}
+            
+            {% if proof_data.proof_data and proof_data.proof_data.purchase_date %}
+            <div>
+                <strong style="color: #666; font-size: 0.9rem;">Purchase Date:</strong>
+                <p style="color: #2c3e50; margin-top: 5px;">{{ proof_data.proof_data.purchase_date }}</p>
+            </div>
+            {% endif %}
+            
+            {% if proof_data.timestamp %}
+            <div>
+                <strong style="color: #666; font-size: 0.9rem;">Proof Timestamp:</strong>
+                <p style="color: #2c3e50; margin-top: 5px;">{{ proof_data.timestamp }}</p>
+            </div>
+            {% endif %}
+        </div>
+        
+        {% if proof_data.proof_data and proof_data.proof_data.unique_features %}
+        <div style="margin-bottom: 20px;">
+            <strong style="color: #666;">Unique Features:</strong>
+            <p style="color: #666; margin-top: 10px; padding: 15px; background: white; border-radius: 6px;">
+                {{ proof_data.proof_data.unique_features }}
+            </p>
+        </div>
+        {% endif %}
+        
+        {% if proof_data.proof_data and proof_data.proof_data.detailed_description %}
+        <div style="margin-bottom: 20px;">
+            <strong style="color: #666;">Detailed Description:</strong>
+            <p style="color: #666; margin-top: 10px; padding: 15px; background: white; border-radius: 6px;">
+                {{ proof_data.proof_data.detailed_description }}
+            </p>
+        </div>
+        {% endif %}
+        
+        {% if proof_data.signature %}
+        <div style="padding: 15px; background: #e8f4f8; border-radius: 6px; margin-top: 20px;">
+            <strong style="color: #0c5460;">Digital Signature:</strong>
+            <p style="color: #0c5460; margin-top: 5px; font-family: monospace; word-break: break-all;">
+                {{ proof_data.signature[:50] }}...
+            </p>
+            <small style="color: #0c5460;">HMAC-SHA256 signature of proof data</small>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Cryptographic Verification Panel -->
+<div class="card">
+    <h3 style="color: #2c3e50; margin-bottom: 25px;">
+        <i class="fas fa-key"></i> Cryptographic Verification
+    </h3>
+    
+    <form method="POST">
+        <!-- Cryptographic Checks -->
+        <div style="background: #f0f8ff; padding: 25px; border-radius: 8px; margin-bottom: 25px; border-left: 4px solid #3498db;">
+            <h4 style="color: #2c3e50; margin-bottom: 15px;">
+                <i class="fas fa-shield-halved"></i> Cryptographic Checks
+            </h4>
+            
+            <div class="form-group">
+                <label for="cryptographic_check" style="display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" id="cryptographic_check" name="cryptographic_check" value="yes" checked>
+                    <span>Perform Cryptographic Verification</span>
+                </label>
+                <p class="help-text">
+                    Verifies digital signatures and token authenticity using HMAC-SHA256.
+                </p>
+            </div>
+            
+            {% if claim.verification_token %}
+            <div style="margin-top: 15px; padding: 15px; background: #e8f4f8; border-radius: 6px;">
+                <small style="color: #0c5460;">
+                    <i class="fas fa-key"></i> Verification token available: 
+                    {{ claim.verification_token[:30] }}...
+                </small>
+            </div>
+            {% endif %}
+            
+            {% if claim.digital_signature %}
+            <div style="margin-top: 10px; padding: 15px; background: #e8f4f8; border-radius: 6px;">
+                <small style="color: #0c5460;">
+                    <i class="fas fa-signature"></i> Digital signature available: 
+                    {{ claim.digital_signature[:30] }}...
+                </small>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Previous Verification Results -->
+        {% if verification_summary and verification_summary.cryptographic_checks %}
+        <div style="background: #fff3cd; padding: 25px; border-radius: 8px; margin-bottom: 25px; border-left: 4px solid #f39c12;">
+            <h4 style="color: #856404; margin-bottom: 15px;">
+                <i class="fas fa-history"></i> Previous Verification Results
+            </h4>
+            
+            <div style="display: grid; gap: 15px;">
+                {% for check in verification_summary.cryptographic_checks %}
+                <div style="padding: 15px; background: white; border-radius: 6px; border-left: 4px solid {% if check.status == 'PASS' %}#27ae60{% else %}#e74c3c{% endif %};">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <strong style="color: #2c3e50;">{{ check.type }}</strong>
+                        <span style="padding: 3px 10px; border-radius: 15px; font-size: 0.8rem; 
+                              {% if check.status == 'PASS' %}background: #d4edda; color: #155724;
+                              {% else %}background: #f8d7da; color: #721c24;{% endif %}">
+                            {{ check.status }}
+                        </span>
+                    </div>
+                    <p style="color: #666; margin-top: 8px; font-size: 0.9rem;">{{ check.details }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            
+            {% if verification_summary.cryptographic_score %}
+            <div style="margin-top: 20px; padding: 15px; background: {% if verification_summary.cryptographic_score >= 70 %}#d4edda{% else %}#fff3cd{% endif %}; border-radius: 6px;">
+                <strong>Previous Cryptographic Score:</strong> {{ verification_summary.cryptographic_score }}%
+                <br>
+                <small>
+                    {% if verification_summary.cryptographic_score >= 90 %}
+                    🎉 Excellent - Strong cryptographic evidence
+                    {% elif verification_summary.cryptographic_score >= 70 %}
+                    👍 Good - Adequate cryptographic evidence
+                    {% elif verification_summary.cryptographic_score >= 50 %}
+                    ⚠️ Fair - Basic cryptographic evidence
+                    {% else %}
+                    ❌ Poor - Weak cryptographic evidence
+                    {% endif %}
+                </small>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        <!-- Proof of Ownership Verification -->
+        {% if proof_data %}
+        <div style="background: #f0f9ff; padding: 25px; border-radius: 8px; margin-bottom: 25px; border-left: 4px solid #17a2b8;">
+            <h4 style="color: #0c5460; margin-bottom: 15px;">
+                <i class="fas fa-fingerprint"></i> Proof of Ownership Verification
+            </h4>
+            
+            <div class="form-group">
+                <label for="proof_verification" style="display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" id="proof_verification" name="proof_verification" value="yes" {% if proof_data %}checked{% endif %}>
+                    <span>Verify Proof of Ownership Evidence</span>
+                </label>
+                <p class="help-text">
+                    Check provided ownership evidence (serial numbers, purchase dates, unique features).
+                </p>
+            </div>
+            
+            <div style="margin-top: 15px; display: grid; gap: 12px;">
+                {% if proof_data.proof_data and proof_data.proof_data.serial_number %}
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" id="verify_serial" class="proof-checkbox" checked>
+                    <label for="verify_serial" style="color: #666; cursor: pointer;">
+                        Verify serial number authenticity
+                    </label>
+                </div>
+                {% endif %}
+                
+                {% if proof_data.proof_data and proof_data.proof_data.purchase_date %}
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" id="verify_purchase_date" class="proof-checkbox" checked>
+                    <label for="verify_purchase_date" style="color: #666; cursor: pointer;">
+                        Validate purchase date consistency
+                    </label>
+                </div>
+                {% endif %}
+                
+                {% if proof_data.proof_data and proof_data.proof_data.unique_features %}
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" id="verify_features" class="proof-checkbox" checked>
+                    <label for="verify_features" style="color: #666; cursor: pointer;">
+                        Check unique features accuracy
+                    </label>
+                </div>
+                {% endif %}
+                
+                {% if proof_data.proof_data and proof_data.proof_data.detailed_description %}
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" id="verify_description" class="proof-checkbox">
+                    <label for="verify_description" style="color: #666; cursor: pointer;">
+                        Review detailed description
+                    </label>
+                </div>
+                {% endif %}
+                
+                {% if proof_data.signature %}
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" id="verify_signature" class="proof-checkbox" checked>
+                    <label for="verify_signature" style="color: #666; cursor: pointer;">
+                        Validate digital signature
+                    </label>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Verification Decision -->
+        <div class="form-group">
+            <label for="verification_status">
+                <i class="fas fa-check-double"></i> Verification Decision *
+            </label>
+            <select id="verification_status" name="verification_status" required>
+                <option value="">Select Decision</option>
+                <option value="verified">✓ Verify Claim (Approve)</option>
+                <option value="needs_info">⏳ Request More Information</option>
+                <option value="rejected">✗ Reject Claim</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="admin_notes">
+                <i class="fas fa-sticky-note"></i> Verification Notes
+            </label>
+            <textarea id="admin_notes" name="admin_notes" rows="4"
+                      placeholder="Add detailed notes about cryptographic verification and proof analysis..."></textarea>
+        </div>
+        
+        <!-- Security Checklist -->
+        <div style="background: #f8f9fa; padding: 25px; border-radius: 8px; margin: 25px 0;">
+            <h4 style="color: #2c3e50; margin-bottom: 15px;">
+                <i class="fas fa-clipboard-check"></i> Cryptographic Verification Checklist:
+            </h4>
+            
+            <div style="display: grid; gap: 12px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" id="check_signature" class="crypto-checkbox" checked>
+                    <label for="check_signature" style="color: #666; cursor: pointer;">
+                        HMAC-SHA256 signature verification
+                    </label>
+                </div>
+                
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" id="check_token" class="crypto-checkbox" checked>
+                    <label for="check_token" style="color: #666; cursor: pointer;">
+                        Verification token validation (24-hour window)
+                    </label>
+                </div>
+                
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" id="check_digitalsig" class="crypto-checkbox" checked>
+                    <label for="check_digitalsig" style="color: #666; cursor: pointer;">
+                        Digital signature verification
+                    </label>
+                </div>
+                
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" id="check_integrity" class="crypto-checkbox">
+                    <label for="check_integrity" style="color: #666; cursor: pointer;">
+                        Data integrity check (anti-tampering)
+                    </label>
+                </div>
+                
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" id="check_replay" class="crypto-checkbox" checked>
+                    <label for="check_replay" style="color: #666; cursor: pointer;">
+                        Anti-replay protection verification
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <button type="submit" class="btn btn-primary btn-large">
+                <i class="fas fa-key"></i> Submit Cryptographic Verification
+            </button>
+            <a href="{{ url_for('admin_claims_review') }}" class="btn btn-secondary" style="margin-left: 15px;">
+                <i class="fas fa-times"></i> Cancel
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Technical Details -->
+<div class="card">
+    <h3 style="color: #2c3e50; margin-bottom: 25px;">
+        <i class="fas fa-microchip"></i> Cryptographic Implementation Details
+    </h3>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+        <div style="padding: 20px; background: #f8f9fa; border-radius: 10px;">
+            <h4 style="color: #2c3e50; margin-bottom: 10px;">Algorithm</h4>
+            <p style="color: #666; font-size: 0.9rem;">HMAC-SHA256</p>
+            <small style="color: #888;">Keyed-Hash Message Authentication</small>
+        </div>
+        
+        <div style="padding: 20px; background: #f8f9fa; border-radius: 10px;">
+            <h4 style="color: #2c3e50; margin-bottom: 10px;">Key Strength</h4>
+            <p style="color: #666; font-size: 0.9rem;">256-bit keys</p>
+            <small style="color: #888;">Military-grade encryption</small>
+        </div>
+        
+        <div style="padding: 20px; background: #f8f9fa; border-radius: 10px;">
+            <h4 style="color: #2c3e50; margin-bottom: 10px;">Token Validity</h4>
+            <p style="color: #666; font-size: 0.9rem;">24 hours</p>
+            <small style="color: #888;">Anti-replay protection</small>
+        </div>
+        
+        <div style="padding: 20px; background: #f8f9fa; border-radius: 10px;">
+            <h4 style="color: #2c3e50; margin-bottom: 10px;">Integrity</h4>
+            <p style="color: #666; font-size: 0.9rem;">Digital Signatures</p>
+            <small style="color: #888;">Tamper-evident seals</small>
+        </div>
+    </div>
+    
+    <div style="margin-top: 25px; padding: 20px; background: #e8f4f8; border-radius: 10px;">
+        <h4 style="color: #0c5460; margin-bottom: 15px;">
+            <i class="fas fa-info-circle"></i> How Cryptographic Verification Works:
+        </h4>
+        <ol style="color: #0c5460; padding-left: 20px;">
+            <li><strong>Claim Submission:</strong> User creates claim with cryptographic token and proof data</li>
+            <li><strong>Proof Upload:</strong> User provides serial numbers, purchase dates, unique features</li>
+            <li><strong>Digital Signature:</strong> Claim message is signed with HMAC-SHA256</li>
+            <li><strong>Token Generation:</strong> Timestamped verification token created</li>
+            <li><strong>Admin Verification:</strong> System verifies signatures, tokens, and proof evidence</li>
+            <li><strong>Score Calculation:</strong> Cryptographic and ownership evidence scored (0-100%)</li>
+            <li><strong>Decision:</strong> Admin makes final decision based on all evidence</li>
+        </ol>
+    </div>
+</div>
+
+<script>
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const status = document.getElementById('verification_status').value;
+        const cryptoCheck = document.getElementById('cryptographic_check').checked;
+        const proofCheck = document.getElementById('proof_verification');
+        
+        if (!status) {
+            e.preventDefault();
+            alert('Please select a verification decision.');
+            return false;
+        }
+        
+        if (status === 'rejected') {
+            const confirmed = confirm('Are you sure you want to reject this claim? All cryptographic evidence will be discarded.');
+            if (!confirmed) {
+                e.preventDefault();
+                return false;
+            }
+        }
+        
+        let totalScore = 0;
+        let maxScore = 0;
+        
+        // Calculate cryptographic score
+        if (cryptoCheck) {
+            const cryptoCheckboxes = document.querySelectorAll('.crypto-checkbox');
+            const cryptoChecked = Array.from(cryptoCheckboxes).filter(cb => cb.checked).length;
+            totalScore += cryptoChecked * 20;
+            maxScore += 100;
+        }
+        
+        // Calculate proof of ownership score
+        if (proofCheck && proofCheck.checked) {
+            const proofCheckboxes = document.querySelectorAll('.proof-checkbox');
+            const proofChecked = Array.from(proofCheckboxes).filter(cb => cb.checked).length;
+            totalScore += proofChecked * 15;
+            maxScore += proofCheckboxes.length * 15;
+        }
+        
+        // Calculate final percentage
+        const finalScore = maxScore > 0 ? Math.round((totalScore / maxScore) * 100) : 0;
+        
+        if (cryptoCheck || (proofCheck && proofCheck.checked)) {
+            if (finalScore < 60) {
+                const proceed = confirm(`Low combined verification score (${finalScore}%). Few security checks selected. Proceed anyway?`);
+                if (!proceed) {
+                    e.preventDefault();
+                    return false;
+                }
+            }
+            
+            // Auto-populate notes with verification results
+            const notesTextarea = document.getElementById('admin_notes');
+            
+            let verificationNotes = '=== CRYPTOGRAPHIC VERIFICATION REPORT ===\n';
+            verificationNotes += `Timestamp: ${new Date().toLocaleString()}\n`;
+            verificationNotes += `Combined Verification Score: ${finalScore}%\n`;
+            
+            if (cryptoCheck) {
+                const cryptoCheckboxes = document.querySelectorAll('.crypto-checkbox:checked');
+                verificationNotes += '----------------------------------------\n';
+                verificationNotes += 'CRYPTOGRAPHIC CHECKS PERFORMED:\n';
+                
+                cryptoCheckboxes.forEach(checkbox => {
+                    const label = checkbox.nextElementSibling.textContent;
+                    verificationNotes += `✓ ${label}\n`;
+                });
+            }
+            
+            if (proofCheck && proofCheck.checked) {
+                const proofCheckboxes = document.querySelectorAll('.proof-checkbox:checked');
+                verificationNotes += '----------------------------------------\n';
+                verificationNotes += 'PROOF OF OWNERSHIP CHECKS:\n';
+                
+                proofCheckboxes.forEach(checkbox => {
+                    const label = checkbox.nextElementSibling.textContent;
+                    verificationNotes += `✓ ${label}\n`;
+                });
+            }
+            
+            verificationNotes += '----------------------------------------\n';
+            verificationNotes += 'RECOMMENDATION: ';
+            
+            if (finalScore >= 80) {
+                verificationNotes += 'STRONG EVIDENCE - APPROVE\n';
+            } else if (finalScore >= 60) {
+                verificationNotes += 'ADEQUATE EVIDENCE - CONSIDER APPROVAL\n';
+            } else {
+                verificationNotes += 'WEAK EVIDENCE - FURTHER REVIEW NEEDED\n';
+            }
+            
+            verificationNotes += '========================================\n\n';
+            
+            const existingNotes = notesTextarea.value;
+            notesTextarea.value = verificationNotes + (existingNotes ? existingNotes : '');
+        }
+        
+        return true;
+    });
+    
+    // Update score display
+    function updateScoreDisplay() {
+        let totalScore = 0;
+        let maxScore = 0;
+        
+        // Cryptographic score
+        if (document.getElementById('cryptographic_check').checked) {
+            const cryptoCheckboxes = document.querySelectorAll('.crypto-checkbox:checked');
+            totalScore += cryptoCheckboxes.length * 20;
+            maxScore += 100;
+        }
+        
+        // Proof of ownership score
+        const proofCheck = document.getElementById('proof_verification');
+        if (proofCheck && proofCheck.checked) {
+            const proofCheckboxes = document.querySelectorAll('.proof-checkbox');
+            const proofChecked = document.querySelectorAll('.proof-checkbox:checked');
+            totalScore += proofChecked.length * 15;
+            maxScore += proofCheckboxes.length * 15;
+        }
+        
+        const finalScore = maxScore > 0 ? Math.round((totalScore / maxScore) * 100) : 0;
+        
+        const scoreDisplay = document.getElementById('verification-score-display') || 
+            (function() {
+                const div = document.createElement('div');
+                div.id = 'verification-score-display';
+                div.style.cssText = 'margin-top: 20px; padding: 15px; background: #e8f4f8; border-radius: 6px; text-align: center;';
+                const form = document.querySelector('form');
+                const submitButton = document.querySelector('button[type="submit"]');
+                form.insertBefore(div, submitButton.parentNode);
+                return div;
+            })();
+        
+        scoreDisplay.innerHTML = `
+            <strong style="color: #2c3e50;">Estimated Verification Score:</strong>
+            <div style="font-size: 2rem; font-weight: bold; color: 
+                ${finalScore >= 80 ? '#27ae60' : finalScore >= 60 ? '#f39c12' : '#e74c3c'}; 
+                margin: 10px 0;">
+                ${finalScore}%
+            </div>
+            <div style="color: ${finalScore >= 80 ? '#27ae60' : finalScore >= 60 ? '#f39c12' : '#e74c3c'};">
+                ${finalScore >= 80 ? '🎉 Strong Evidence' : 
+                  finalScore >= 60 ? '👍 Good Evidence' : 
+                  '⚠️ Needs Review'}
+            </div>
+        `;
+    }
+    
+    // Attach event listeners to all checkboxes
+    document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+        checkbox.addEventListener('change', updateScoreDisplay);
+    });
+    
+    // Initial score display
+    updateScoreDisplay();
+</script>
+{% endblock %}

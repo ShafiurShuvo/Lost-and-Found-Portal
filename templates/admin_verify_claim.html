@@ -1,0 +1,179 @@
+<!-- templates/admin_verify_claim.html -->
+{% extends "base.html" %}
+
+{% block title %}Admin Verify Claim - Lost & Found{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 style="color: #2c3e50; margin-bottom: 20px;">
+        <i class="fas fa-user-shield"></i> Admin Claim Verification
+    </h2>
+    <p style="color: #666; margin-bottom: 25px;">Verify the legitimacy of this claim before final approval.</p>
+    
+    <div style="display: flex; gap: 15px; margin-bottom: 30px;">
+        <a href="{{ url_for('admin_claims_review') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Review
+        </a>
+    </div>
+</div>
+
+<!-- Claim Information -->
+<div class="card">
+    <h3 style="color: #2c3e50; margin-bottom: 25px;">
+        <i class="fas fa-info-circle"></i> Claim Information
+    </h3>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 25px;">
+        <div>
+            <strong style="color: #666; font-size: 0.9rem;">Claim ID:</strong>
+            <p style="color: #2c3e50; margin-top: 5px;">#{{ claim.id }}</p>
+        </div>
+        
+        <div>
+            <strong style="color: #666; font-size: 0.9rem;">Claimant:</strong>
+            <p style="color: #2c3e50; margin-top: 5px;">{{ claim.claimant_username }}</p>
+        </div>
+        
+        <div>
+            <strong style="color: #666; font-size: 0.9rem;">Item Owner:</strong>
+            <p style="color: #2c3e50; margin-top: 5px;">{{ claim.owner_username }}</p>
+        </div>
+        
+        <div>
+            <strong style="color: #666; font-size: 0.9rem;">Status:</strong>
+            <p style="margin-top: 5px;">
+                <span style="padding: 5px 15px; border-radius: 15px; 
+                      {% if claim.status == 'pending' %}background: #fff3cd; color: #856404;
+                      {% elif claim.status == 'approved' %}background: #d4edda; color: #155724;
+                      {% else %}background: #f8d7da; color: #721c24;{% endif %}">
+                    {{ claim.status|title }}
+                </span>
+            </p>
+        </div>
+    </div>
+    
+    {% if claim.decrypted_data and claim.claim_message %}
+    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+        <h4 style="color: #2c3e50; margin-bottom: 15px;">Claim Message:</h4>
+        <p style="color: #666; line-height: 1.6; white-space: pre-wrap;">{{ claim.claim_message }}</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Admin Verification Form -->
+<div class="card">
+    <h3 style="color: #2c3e50; margin-bottom: 25px;">
+        <i class="fas fa-check-circle"></i> Admin Verification
+    </h3>
+    
+    <form method="POST">
+        <div class="form-group">
+            <label for="verification_status">
+                <i class="fas fa-check-double"></i> Verification Decision *
+            </label>
+            <select id="verification_status" name="verification_status" required>
+                <option value="">Select Decision</option>
+                <option value="verified">✓ Verify Claim (Approve)</option>
+                <option value="needs_info">⏳ Request More Information</option>
+                <option value="rejected">✗ Reject Claim</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="admin_notes">
+                <i class="fas fa-sticky-note"></i> Admin Notes
+            </label>
+            <textarea id="admin_notes" name="admin_notes" rows="4"
+                      placeholder="Add notes about your verification decision..."></textarea>
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 25px; border-radius: 8px; margin: 25px 0;">
+            <h4 style="color: #2c3e50; margin-bottom: 15px;">
+                <i class="fas fa-clipboard-check"></i> Verification Checklist:
+            </h4>
+            
+            <div style="display: grid; gap: 12px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" id="check_details" class="checklist-checkbox">
+                    <label for="check_details" style="color: #666; cursor: pointer;">
+                        Claim details match item description
+                    </label>
+                </div>
+                
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" id="check_evidence" class="checklist-checkbox">
+                    <label for="check_evidence" style="color: #666; cursor: pointer;">
+                        Evidence provided is legitimate
+                    </label>
+                </div>
+                
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" id="check_suspicious" class="checklist-checkbox">
+                    <label for="check_suspicious" style="color: #666; cursor: pointer;">
+                        No suspicious activity detected
+                    </label>
+                </div>
+                
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" id="check_history" class="checklist-checkbox">
+                    <label for="check_history" style="color: #666; cursor: pointer;">
+                        Claimant history is clean
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <button type="submit" class="btn btn-primary btn-large">
+                <i class="fas fa-check-circle"></i> Submit Verification
+            </button>
+            <a href="{{ url_for('admin_claims_review') }}" class="btn btn-secondary" style="margin-left: 15px;">
+                <i class="fas fa-times"></i> Cancel
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const status = document.getElementById('verification_status').value;
+        
+        if (!status) {
+            e.preventDefault();
+            alert('Please select a verification decision.');
+            return false;
+        }
+        
+        if (status === 'rejected') {
+            const confirmed = confirm('Are you sure you want to reject this claim? This action cannot be undone.');
+            if (!confirmed) {
+                e.preventDefault();
+                return false;
+            }
+        }
+        
+        // Auto-populate notes from checklist
+        const checkboxes = document.querySelectorAll('.checklist-checkbox');
+        const notesTextarea = document.getElementById('admin_notes');
+        const checkedItems = [];
+        
+        checkboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                const label = checkbox.nextElementSibling.textContent;
+                checkedItems.push(`✓ ${label}`);
+            }
+        });
+        
+        if (checkedItems.length > 0) {
+            const existingNotes = notesTextarea.value;
+            const checklistNotes = 'Checklist Results:\n' + checkedItems.join('\n');
+            
+            if (existingNotes) {
+                notesTextarea.value = existingNotes + '\n\n' + checklistNotes;
+            } else {
+                notesTextarea.value = checklistNotes;
+            }
+        }
+    });
+</script>
+{% endblock %}

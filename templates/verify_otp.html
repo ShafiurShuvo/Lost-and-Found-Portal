@@ -1,0 +1,329 @@
+<!-- templates/verify_otp.html -->
+{% extends "base.html" %}
+
+{% block title %}Verify OTP - Lost & Found{% endblock %}
+
+{% block content %}
+<style>
+body {
+    background: linear-gradient(135deg, #f3e9f8 0%, #e6d9f0 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+}
+
+.otp-container {
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+}
+
+.otp-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    padding: 50px 30px;
+}
+
+.otp-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.otp-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    color: white;
+    font-size: 30px;
+}
+
+.otp-header h1 {
+    font-size: 28px;
+    color: #333;
+    margin: 0 0 10px 0;
+    font-weight: 700;
+}
+
+.otp-header p {
+    color: #666;
+    margin: 0;
+    font-size: 14px;
+}
+
+.otp-email-info {
+    background: #f8f9ff;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.otp-email-info p {
+    margin: 0;
+    color: #555;
+    font-size: 14px;
+}
+
+.otp-form-group {
+    margin-bottom: 25px;
+}
+
+.otp-label {
+    display: block;
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.otp-input {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 24px;
+    text-align: center;
+    letter-spacing: 8px;
+    font-weight: bold;
+    font-family: 'Courier New', monospace;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.otp-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.otp-timer {
+    background: #fff3cd;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+.otp-timer-label {
+    color: #666;
+    font-size: 12px;
+    margin: 0 0 10px 0;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.otp-timer-display {
+    font-size: 32px;
+    font-weight: bold;
+    color: #f39c12;
+    font-family: 'Courier New', monospace;
+}
+
+.otp-btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 12px;
+}
+
+.otp-btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.otp-btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+}
+
+.otp-btn-secondary {
+    background: #f0f0f0;
+    color: #333;
+}
+
+.otp-btn-secondary:hover {
+    background: #e0e0e0;
+}
+
+.otp-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.otp-footer {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+    text-align: center;
+}
+
+.otp-footer a {
+    color: #667eea;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.otp-footer a:hover {
+    text-decoration: underline;
+}
+</style>
+
+<div class="otp-container">
+    <div class="otp-card">
+        <div class="otp-header">
+            <div class="otp-icon">
+                <i class="fas fa-lock"></i>
+            </div>
+            <h1>Verify OTP</h1>
+            <p>Enter the 6-digit code sent to your email</p>
+        </div>
+        
+        {% if email %}
+        <div class="otp-email-info">
+            <p><strong>OTP sent to:</strong> {{ email }}</p>
+        </div>
+        {% endif %}
+        
+        <form method="POST" action="{{ url_for('verify_otp') }}">
+            <div class="otp-form-group">
+                <label for="otp_code" class="otp-label">6-Digit Code</label>
+                <input type="text" 
+                       id="otp_code" 
+                       name="otp_code" 
+                       class="otp-input"
+                       required
+                       maxlength="6"
+                       inputmode="numeric"
+                       pattern="[0-9]{6}"
+                       placeholder="000000"
+                       autocomplete="off">
+            </div>
+            
+            <div class="otp-timer">
+                <p class="otp-timer-label">Time Remaining</p>
+                <div class="otp-timer-display" id="time-display">
+                    {% if remaining_time %}
+                        {{ remaining_time }}s
+                    {% else %}
+                        Expired
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- OTP Bypass Option -->
+            <div style="background: #e8f5e9; border-radius: 8px; padding: 15px; margin-bottom: 25px; border-left: 4px solid #27ae60;">
+                <label style="display: flex; align-items: center; gap: 10px; color: #27ae60; font-weight: 600; margin: 0; cursor: pointer;">
+                    <input type="checkbox" name="bypass_otp" id="bypass_otp" style="width: 18px; height: 18px; cursor: pointer;">
+                    <span>Don't ask for OTP for the next 10 minutes</span>
+                </label>
+                <small style="color: #27ae60; display: block; margin-top: 8px; margin-left: 28px;">
+                    ℹ️ Allows you to login from this device without entering OTP for 10 minutes
+                </small>
+            </div>
+            
+            <button type="submit" class="otp-btn otp-btn-primary">
+                Verify & Login
+            </button>
+            <a href="{{ url_for('login') }}" class="otp-btn otp-btn-secondary" style="display: block; text-align: center; text-decoration: none; color: #333;">
+                Back to Login
+            </a>
+        </form>
+        
+        <div class="otp-footer">
+            <p style="margin: 0; color: #999; font-size: 12px;">
+                Didn't receive code? <a href="{{ url_for('login') }}">Try logging in again</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+// Countdown timer
+function updateTimer() {
+    {% if remaining_time and remaining_time > 0 %}
+    let timeRemaining = {{ remaining_time }};
+    const timerDisplay = document.getElementById('time-display');
+    
+    function decrementTimer() {
+        timeRemaining--;
+        
+        if (timeRemaining > 0) {
+            timerDisplay.textContent = timeRemaining + 's';
+            
+            // Change color based on remaining time
+            const timerContainer = document.getElementById('timer-container');
+            if (timeRemaining <= 10) {
+                timerContainer.style.backgroundColor = '#f8d7da';
+                timerContainer.style.borderLeftColor = '#e74c3c';
+                timerDisplay.style.color = '#e74c3c';
+            }
+            
+            setTimeout(decrementTimer, 1000);
+        } else {
+            timerDisplay.textContent = 'Expired - Please login again';
+            timerDisplay.style.color = '#e74c3c';
+            document.getElementById('otp_code').disabled = true;
+            document.querySelector('button[type="submit"]').disabled = true;
+        }
+    }
+    
+    // Start countdown
+    decrementTimer();
+    {% endif %}
+}
+
+// Start timer when page loads
+window.addEventListener('load', updateTimer);
+
+// Auto-focus and restrict input to digits
+document.getElementById('otp_code').addEventListener('input', function(e) {
+    // Remove any non-digits
+    e.target.value = e.target.value.replace(/[^0-9]/g, '');
+    
+    // Auto-submit when 6 digits are entered
+    if (e.target.value.length === 6) {
+        // Optional: uncomment to auto-submit
+        // e.target.form.submit();
+    }
+});
+
+// Focus on OTP input on page load
+window.addEventListener('load', function() {
+    document.getElementById('otp_code').focus();
+});
+</script>
+
+<style>
+.btn-large {
+    padding: 15px 30px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 8px;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.form-group input {
+    transition: all 0.3s ease;
+}
+</style>
+{% endblock %}

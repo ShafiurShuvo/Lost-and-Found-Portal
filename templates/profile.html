@@ -1,0 +1,132 @@
+<!-- templates/profile.html -->
+{% extends "base.html" %}
+
+{% block title %}User Profile - Lost & Found{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <h2 style="color: #2c3e50;">
+            <i class="fas fa-user-circle"></i> User Profile
+        </h2>
+        <a href="{{ url_for('edit_profile') }}" class="btn btn-primary">
+            <i class="fas fa-edit"></i> Edit Profile
+        </a>
+    </div>
+    
+    <div style="background: #f8f9fa; padding: 30px; border-radius: 10px; border-left: 4px solid #3498db;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+            <!-- Left Column -->
+            <div>
+                <div style="margin-bottom: 25px;">
+                    <label style="color: #666; font-weight: 600; display: block; margin-bottom: 8px;">
+                        <i class="fas fa-user"></i> Username
+                    </label>
+                    <p style="color: #2c3e50; font-size: 1.1rem; background: white; padding: 12px 15px; border-radius: 8px;">
+                        {{ user.username }}
+                    </p>
+                </div>
+                
+                <div style="margin-bottom: 25px;">
+                    <label style="color: #666; font-weight: 600; display: block; margin-bottom: 8px;">
+                        <i class="fas fa-envelope"></i> Email Address
+                    </label>
+                    <p style="color: #2c3e50; font-size: 1.1rem; background: white; padding: 12px 15px; border-radius: 8px;">
+                        {{ user.email }}
+                    </p>
+                </div>
+                
+                <div style="margin-bottom: 25px;">
+                    <label style="color: #666; font-weight: 600; display: block; margin-bottom: 8px;">
+                        <i class="fas fa-id-card"></i> Full Name
+                    </label>
+                    <p style="color: #2c3e50; font-size: 1.1rem; background: white; padding: 12px 15px; border-radius: 8px;">
+                        {{ user.full_name if user.full_name else 'Not set' }}
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Right Column -->
+            <div>
+                <div style="margin-bottom: 25px;">
+                    <label style="color: #666; font-weight: 600; display: block; margin-bottom: 8px;">
+                        <i class="fas fa-shield-alt"></i> Account Role
+                    </label>
+                    <p style="color: #2c3e50; font-size: 1.1rem; background: white; padding: 12px 15px; border-radius: 8px;">
+                        {% if user.role == 'admin' %}
+                            <span style="display: inline-block; padding: 5px 12px; border-radius: 20px; background: #9b59b6; color: white;">
+                                {{ user.role|title }}
+                            </span>
+                        {% else %}
+                            <span style="display: inline-block; padding: 5px 12px; border-radius: 20px; background: #d4edda; color: #155724;">
+                                {{ user.role|title }}
+                            </span>
+                        {% endif %}
+                    </p>
+                </div>
+                
+                <div style="margin-bottom: 25px;">
+                    <label style="color: #666; font-weight: 600; display: block; margin-bottom: 8px;">
+                        <i class="fas fa-calendar"></i> Account Created
+                    </label>
+                    <p style="color: #2c3e50; font-size: 1.1rem; background: white; padding: 12px 15px; border-radius: 8px;">
+                        {{ user.created_at|default('N/A') }}
+                    </p>
+                </div>
+                
+                <div style="margin-bottom: 25px;">
+                    <label style="color: #666; font-weight: 600; display: block; margin-bottom: 8px;">
+                        <i class="fas fa-clock"></i> Last Login
+                    </label>
+                    <p style="color: #2c3e50; font-size: 1.1rem; background: white; padding: 12px 15px; border-radius: 8px;">
+                        {{ user.last_login|default('Never logged in') }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div style="margin-top: 30px; display: flex; gap: 15px; justify-content: center;">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+        <a href="{{ url_for('edit_profile') }}" class="btn btn-primary">
+            <i class="fas fa-edit"></i> Edit Information
+        </a>
+    </div>
+</div>
+
+<!-- Additional Account Info Card -->
+<div class="card" style="margin-top: 30px;">
+    <h3 style="color: #2c3e50; margin-bottom: 20px;">
+        <i class="fas fa-cog"></i> Account Settings
+    </h3>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+        <a href="{{ url_for('dashboard') }}" style="padding: 20px; background: #f8f9fa; border-radius: 10px; text-decoration: none; color: inherit; text-align: center; transition: all 0.3s ease; border-left: 4px solid #3498db;">
+            <div style="font-size: 2rem; color: #3498db; margin-bottom: 10px;">
+                <i class="fas fa-home"></i>
+            </div>
+            <h4>Dashboard</h4>
+            <p style="color: #666; font-size: 0.9rem;">Return to main dashboard</p>
+        </a>
+        
+        <a href="{{ url_for('edit_profile') }}" style="padding: 20px; background: #f8f9fa; border-radius: 10px; text-decoration: none; color: inherit; text-align: center; transition: all 0.3s ease; border-left: 4px solid #27ae60;">
+            <div style="font-size: 2rem; color: #27ae60; margin-bottom: 10px;">
+                <i class="fas fa-pencil-alt"></i>
+            </div>
+            <h4>Edit Profile</h4>
+            <p style="color: #666; font-size: 0.9rem;">Update your information</p>
+        </a>
+        
+        <a href="{{ url_for('logout') }}" style="padding: 20px; background: #f8f9fa; border-radius: 10px; text-decoration: none; color: inherit; text-align: center; transition: all 0.3s ease; border-left: 4px solid #e74c3c;">
+            <div style="font-size: 2rem; color: #e74c3c; margin-bottom: 10px;">
+                <i class="fas fa-sign-out-alt"></i>
+            </div>
+            <h4>Logout</h4>
+            <p style="color: #666; font-size: 0.9rem;">Sign out of your account</p>
+        </a>
+    </div>
+</div>
+{% endblock %}

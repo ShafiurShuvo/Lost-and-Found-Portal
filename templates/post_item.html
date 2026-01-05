@@ -1,0 +1,102 @@
+<!-- templates/post_item.html -->
+{% extends "base.html" %}
+
+{% block title %}Post Item - Lost & Found{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 800px; margin: 0 auto;">
+    <h2 style="color: #2c3e50; margin-bottom: 30px;">
+        <i class="fas fa-plus-circle"></i> Post Lost or Found Item
+    </h2>
+    
+    <form method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="title"><i class="fas fa-heading"></i> Item Title *</label>
+            <input type="text" id="title" name="title" required 
+                   placeholder="e.g., 'Black Wallet Found at Library'">
+        </div>
+        
+        <div class="form-group">
+            <label for="description"><i class="fas fa-align-left"></i> Description *</label>
+            <textarea id="description" name="description" rows="5" required 
+                      placeholder="Describe the item in detail (color, size, brand, distinguishing features)"></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="location"><i class="fas fa-map-marker-alt"></i> Location *</label>
+            <input type="text" id="location" name="location" required 
+                   placeholder="Where was it lost/found? (e.g., 'Main Library, 2nd floor')">
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px;">
+            <div class="form-group">
+                <label for="item_type"><i class="fas fa-tag"></i> Item Type *</label>
+                <select id="item_type" name="item_type" required>
+                    <option value="">Select type</option>
+                    <option value="lost">Lost Item</option>
+                    <option value="found">Found Item</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="category"><i class="fas fa-folder"></i> Category *</label>
+                <select id="category" name="category" required>
+                    <option value="">Select category</option>
+                    <option value="electronics">Electronics</option>
+                    <option value="documents">Documents</option>
+                    <option value="clothing">Clothing</option>
+                    <option value="accessories">Accessories</option>
+                    <option value="keys">Keys</option>
+                    <option value="wallet">Wallet/Purse</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="photo"><i class="fas fa-camera"></i> Photo (Optional)</label>
+            <input type="file" id="photo" name="photo" accept="image/*">
+            <p class="help-text">Upload a clear photo of the item. Max size: 5MB. Allowed: JPG, PNG, GIF</p>
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 25px 0;">
+            <h4 style="color: #2c3e50; margin-bottom: 10px;">
+                <i class="fas fa-shield-alt"></i> Security Information
+            </h4>
+            <p style="color: #666; font-size: 0.9rem;">
+                All item details will be <strong>encrypted</strong> using custom RSA + ECC algorithms 
+                before storage. Your data is protected end-to-end.
+            </p>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <button type="submit" class="btn btn-primary btn-large">
+                <i class="fas fa-paper-plane"></i> Post Item Securely
+            </button>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary" style="margin-left: 15px;">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const title = document.getElementById('title').value;
+        const description = document.getElementById('description').value;
+        const location = document.getElementById('location').value;
+        
+        if (!title || !description || !location) {
+            e.preventDefault();
+            alert('Please fill all required fields marked with *');
+            return false;
+        }
+        
+        if (description.length < 10) {
+            e.preventDefault();
+            alert('Please provide a more detailed description (at least 10 characters)');
+            return false;
+        }
+    });
+</script>
+{% endblock %}

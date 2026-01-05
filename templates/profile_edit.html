@@ -1,0 +1,95 @@
+<!-- templates/profile_edit.html -->
+{% extends "base.html" %}
+
+{% block title %}Edit Profile - Lost & Found{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="margin-bottom: 30px;">
+        <h2 style="color: #2c3e50; display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-user-edit"></i> Edit Your Profile
+        </h2>
+        <p style="color: #666; margin-top: 10px;">Update your account information below</p>
+    </div>
+    
+    <form method="POST" action="{{ url_for('edit_profile') }}" style="max-width: 600px;">
+        <!-- Username -->
+        <div style="margin-bottom: 25px;">
+            <label for="username" style="color: #2c3e50; font-weight: 600; display: block; margin-bottom: 8px;">
+                <i class="fas fa-user"></i> Username
+            </label>
+            <input type="text" id="username" name="username" value="{{ user.username }}" required 
+                   style="width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; transition: all 0.3s ease;"
+                   onfocus="this.style.borderColor='#3498db'; this.style.boxShadow='0 0 0 3px rgba(52,152,219,0.1)';"
+                   onblur="this.style.borderColor='#ddd'; this.style.boxShadow='none';">
+            <small style="color: #666; display: block; margin-top: 5px;">Your login username (minimum 3 characters). You'll use this to login next time.</small>
+        </div>
+        
+        <!-- Email -->
+        <div style="margin-bottom: 25px;">
+            <label for="email" style="color: #2c3e50; font-weight: 600; display: block; margin-bottom: 8px;">
+                <i class="fas fa-envelope"></i> Email Address
+            </label>
+            <input type="email" id="email" name="email" value="{{ user.email }}" required 
+                   style="width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; transition: all 0.3s ease;"
+                   onfocus="this.style.borderColor='#3498db'; this.style.boxShadow='0 0 0 3px rgba(52,152,219,0.1)';"
+                   onblur="this.style.borderColor='#ddd'; this.style.boxShadow='none';">
+            <small style="color: #666; display: block; margin-top: 5px;">Use a valid email address where you can receive notifications.</small>
+        </div>
+        
+        <!-- Full Name -->
+        <div style="margin-bottom: 25px;">
+            <label for="full_name" style="color: #2c3e50; font-weight: 600; display: block; margin-bottom: 8px;">
+                <i class="fas fa-id-card"></i> Full Name
+            </label>
+            <input type="text" id="full_name" name="full_name" value="{{ user.full_name|default('') }}" placeholder="Enter your full name"
+                   style="width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; transition: all 0.3s ease;"
+                   onfocus="this.style.borderColor='#3498db'; this.style.boxShadow='0 0 0 3px rgba(52,152,219,0.1)';"
+                   onblur="this.style.borderColor='#ddd'; this.style.boxShadow='none';">
+            <small style="color: #666; display: block; margin-top: 5px;">Your display name (optional but helpful for other users).</small>
+        </div>
+        
+        <!-- Current Password (for verification) -->
+        <div style="margin-bottom: 25px; padding: 15px; background: #f0f7ff; border-radius: 8px; border-left: 4px solid #3498db;">
+            <label for="password" style="color: #2c3e50; font-weight: 600; display: block; margin-bottom: 8px;">
+                <i class="fas fa-lock"></i> Current Password (for verification)
+            </label>
+            <input type="password" id="password" name="password" required placeholder="Enter your password to confirm changes"
+                   style="width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; transition: all 0.3s ease;"
+                   onfocus="this.style.borderColor='#3498db'; this.style.boxShadow='0 0 0 3px rgba(52,152,219,0.1)';"
+                   onblur="this.style.borderColor='#ddd'; this.style.boxShadow='none';">
+            <small style="color: #666; display: block; margin-top: 5px;">We need your password to verify these changes for security.</small>
+        </div>
+        
+        <!-- Summary -->
+        <div style="padding: 15px; background: #f9f9f9; border-radius: 8px; margin-bottom: 25px;">
+            <h4 style="color: #2c3e50; margin-bottom: 10px;">
+                <i class="fas fa-info-circle"></i> What can you change?
+            </h4>
+            <ul style="color: #666; margin-left: 20px; line-height: 1.8;">
+                <li><strong>Username:</strong> Your login username (use this to login next time)</li>
+                <li><strong>Email Address:</strong> Your contact email (required)</li>
+                <li><strong>Full Name:</strong> Your display name (optional)</li>
+            </ul>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div style="display: flex; gap: 15px; justify-content: center; margin-top: 30px;">
+            <a href="{{ url_for('profile') }}" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Cancel
+            </a>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Save Changes
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Info Card -->
+<div class="card" style="margin-top: 30px; background: #e8f5e9; border-left: 4px solid #27ae60;">
+    <h4 style="color: #27ae60; margin-bottom: 10px;">
+        <i class="fas fa-check-circle"></i> Profile Update Safety
+    </h4>
+    <p style="color: #555;">All your profile updates are securely saved in our database. Your password is required to prevent unauthorized changes to your account information.</p>
+</div>
+{% endblock %}
